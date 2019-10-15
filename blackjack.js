@@ -6,17 +6,27 @@ let cardWidth = 150;
 let dealerPos = { x: 300, y: 20 };
 let playerPos = { x: 300, y: 500 };
 
-let playerHand = [];
 let dealerHand = [];
+let playerHand = [];
+
+let gameState = 'start';
 
 let deck = buildDeck(decksUsed);
 deck = shuffle(deck);
-console.log(deck);
+dealerHand.push(draw(deck));
 
 //dealCardsToPlayer();
 calcBaseDealerPos();
 
-function draw() {
+function drawGame() {
+    drawButtons();
+}
+
+function drawButtons() {
+
+}
+
+function resetGame() {
 
 }
 
@@ -30,11 +40,7 @@ function dealCardsToPlayer() {
 }
 
 function deal() {
-    playerHand += drawFromDeck();
-}
-
-function dealCard(pos, size, value) {
-    playingTable.innerHTML += createCard(pos, size, value);
+    playerHand += draw(deck);
 }
 
 function calcBaseDealerPos() {
@@ -47,12 +53,13 @@ function calcBaseDealerPos() {
     let x = (game_w / 2) - (cardWidth / 2);
     playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight}" x2="2000" y2="${cardAreaHeight}" stroke="white" stroke-width="1">`;
     playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 2}" x2="2000" y2="${cardAreaHeight * 2}" stroke="white" stroke-width="1">`;
+
     dealCard({ x, y }, { w: cardWidth, h: cardHeight }, "K");
 }
 
-function hit() { }
-
-function fold() { }
+function dealCard(pos, size, value) {
+    playingTable.innerHTML += createCard(pos, size, value);
+}
 
 function createCard(pos, size, value) {
     return `<g>
@@ -62,10 +69,33 @@ function createCard(pos, size, value) {
             </g>`;
 }
 
+function hit() { }
+
+function fold() { }
+
+function draw(deck) {
+    return deck.pop();
+}
+
+function sumHand(hand) {
+    let sum = 0;
+    let aces = 0;
+    for (card of hand) {
+        if (['J', 'Q', 'K'].includes(card.value)) { sum += 10; }
+        else if (card.value === 'A') { aces++; }
+        else { sum += parseInt(card.value); }
+    }
+    for (ace of range(0, aces)) {
+        if (sum + 11 > 21) sum++;
+        else sum += 11;
+    }
+    return sum;
+}
+
 function buildDeck(n) {
     let deck = [];
     for (let i of range(0, n)) {
-        for (sort of ['♠', '♣', '♥', '♦']) {
+        for (sort of ['♠', '♥', '♦', '♣']) {
             for (let value of range(2, 11)) {
                 deck.push({ sort, value: value.toString() });
             }
@@ -83,6 +113,69 @@ function buildDeckAlt(n) {
         for (card of cards) {
             deck.push(card);
         }
+    }
+}
+
+function getUnicode(card) {
+    if (card.sort === '♠') {
+        if (card.value === 'A') { return '🂡'; }
+        else if (card.value === '2') { return '🂢'; }
+        else if (card.value === '3') { return '🂣'; }
+        else if (card.value === '4') { return '🂤'; }
+        else if (card.value === '5') { return '🂥'; }
+        else if (card.value === '6') { return '🂦'; }
+        else if (card.value === '7') { return '🂧'; }
+        else if (card.value === '8') { return '🂨'; }
+        else if (card.value === '9') { return '🂩'; }
+        else if (card.value === '10') { return '🂪'; }
+        else if (card.value === 'J') { return '🂫'; }
+        else if (card.value === 'Q') { return '🂭'; }
+        else if (card.value === 'K') { return '🂮'; }
+    }
+    else if (card.sort === '♥') {
+        if (card.value === 'A') { return '🂱'; }
+        else if (card.value === '2') { return '🂲'; }
+        else if (card.value === '3') { return '🂳'; }
+        else if (card.value === '4') { return '🂴'; }
+        else if (card.value === '5') { return '🂵'; }
+        else if (card.value === '6') { return '🂶'; }
+        else if (card.value === '7') { return '🂷'; }
+        else if (card.value === '8') { return '🂸'; }
+        else if (card.value === '9') { return '🂹'; }
+        else if (card.value === '10') { return '🂺'; }
+        else if (card.value === 'J') { return '🂻'; }
+        else if (card.value === 'Q') { return '🂽'; }
+        else if (card.value === 'K') { return '🂾'; }
+    }
+    else if (card.sort === '♦') {
+        if (card.value === 'A') { return '🃁'; }
+        else if (card.value === '2') { return '🃂'; }
+        else if (card.value === '3') { return '🃃'; }
+        else if (card.value === '4') { return '🃄'; }
+        else if (card.value === '5') { return '🃅'; }
+        else if (card.value === '6') { return '🃆'; }
+        else if (card.value === '7') { return '🃇'; }
+        else if (card.value === '8') { return '🃈'; }
+        else if (card.value === '9') { return '🃉'; }
+        else if (card.value === '10') { return '🃊'; }
+        else if (card.value === 'J') { return '🃋'; }
+        else if (card.value === 'Q') { return '🃍'; }
+        else if (card.value === 'K') { return '🃎'; }
+    }
+    else if (card.sort === '♣') {
+        if (card.value === 'A') { return '🃑'; }
+        else if (card.value === '2') { return '🃒'; }
+        else if (card.value === '3') { return '🃓'; }
+        else if (card.value === '4') { return '🃔'; }
+        else if (card.value === '5') { return '🃕'; }
+        else if (card.value === '6') { return '🃖'; }
+        else if (card.value === '7') { return '🃗'; }
+        else if (card.value === '8') { return '🃘'; }
+        else if (card.value === '9') { return '🃙'; }
+        else if (card.value === '10') { return '🃚'; }
+        else if (card.value === 'J') { return '🃛'; }
+        else if (card.value === 'Q') { return '🃝'; }
+        else if (card.value === 'K') { return '🃞'; }
     }
 }
 
