@@ -54,7 +54,7 @@ function hit() { }
 
 function fold() { }
 
-function createCa rd(pos, size, value) {
+function createCard(pos, size, value) {
     return `<g>
                 <rect class="card" stroke="black" stroke-fill="1" fill="white" x="${pos.x}" y="${pos.y}"
                         style="width:${size.w}; height:${size.h};"></rect>
