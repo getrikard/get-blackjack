@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Blackjack, baby!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: grid;
+            grid-template-rows: 70px 1fr;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            background-color: red;
+            margin: 0;
+            padding: 10px;
+        }
+
+        #playing-table {
+            width: 100%;
+            height: 100%;
+            background-color: green;
+        }
+
+        .card {
+            border: 1px solid black;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1>🎲 Blackjack 🂡🃊</h1>
+    <svg id="playing-table"></svg>
+
+    <script src="blackjack.js"></script>
+</body>
+
+</html>
