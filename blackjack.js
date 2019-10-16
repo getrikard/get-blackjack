@@ -7,8 +7,6 @@ const decksUsed = 2;
 
 let playingTable = document.getElementById('playing-table');
 let cardSize = {};
-// let dealerPos = { x: 300, y: 20 };
-// let playerPos = { x: 300, y: 500 };
 let gameSize = {};
 let cardAreaHeight;
 
@@ -19,26 +17,30 @@ let gameState = 'start';
 
 let deck = buildDeck(decksUsed);
 deck = shuffle(deck);
-//dealerHand.push(draw(deck));
-
-//dealCardsToPlayer();
-calcBaseDealerPos();
+dealerHand.push(draw(deck));
+drawGame();
 
 //
 // View
 //
 
-function dealCardsToPlayer() {
+function drawGame() {
+    // Blank ut spillet
+    calcViewValues();
+    playingTable.innerHTML = '';
 
-    let cardPos = playerPos;
-    for (let i = 0; i < 3; i++) {
-        playingTable.innerHTML += createCard(cardPos, "K");
-        cardPos.x += 40;
+    // Tegn hjelpelinjer
+    playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight}" x2="2000" y2="${cardAreaHeight}" stroke="white" stroke-width="1">`;
+    playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 2}" x2="2000" y2="${cardAreaHeight * 2}" stroke="white" stroke-width="1">`;
+
+    let totalWidth = cardSize.w + ((dealerHand.length - 1) * 40);
+    let y = (cardAreaHeight - cardSize.h) / 2;
+    let x = (gameSize.w / 2) - (totalWidth / 2);
+
+    for (card of dealerHand) {
+        dealCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, 'deal');
+        x += 40;
     }
-}
-
-function deal() {
-    playerHand.push(draw(deck));
 }
 
 function calcViewValues() {
@@ -49,31 +51,28 @@ function calcViewValues() {
     cardSize.w = cardSize.h * 0.62;
 }
 
-function calcBaseDealerPos() {
-    calcViewValues();
-    let y = (cardAreaHeight - cardSize.h) / 2;
-    let x = (gameSize.w / 2) - (cardSize.w / 2);
-    playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight}" x2="2000" y2="${cardAreaHeight}" stroke="white" stroke-width="1">`;
-    playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 2}" x2="2000" y2="${cardAreaHeight * 2}" stroke="white" stroke-width="1">`;
-
-    dealCard({ x, y }, { w: cardSize.w, h: cardSize.h }, draw(deck));
-    dealCard({ x: x + 40, y }, { w: cardSize.w, h: cardSize.h }, draw(deck));
+function dealCard(pos, size, card, onclickFunction) {
+    playingTable.innerHTML += createCard(pos, size, card, onclickFunction);
 }
 
-function dealCard(pos, size, card) {
-    playingTable.innerHTML += createCard(pos, size, card);
-}
-
-function createCard(pos, size, card) {
+function createCard(pos, size, card, onclickFunction) {
     let color = 'black';
-    if (['♥', '♦'].includes(card.sort)) color = 'red';
+    if (['♥', '♦'].includes(card.sort)) {
+        color = 'red';
+    }
     return `<g>
                 <rect class="card" stroke="black" stroke-fill="1" fill="white"
                         x="${pos.x}" y="${pos.y}"
+                        onclick="${onclickFunction}()"
                         style="width:${size.w}; height:${size.h};"></rect>
                 <text x="${pos.x + 10}" y="${pos.y + 25}" fill="${color}">${card.sort}</text>
                 <text x="${pos.x + 10}" y="${pos.y + 50}" fill="${color}">${card.value}</text>
             </g>`;
+}
+
+function deal() {
+    dealerHand.push(draw(deck));
+    drawGame();
 }
 
 function draw(deck) {
