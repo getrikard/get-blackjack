@@ -1,10 +1,16 @@
+//
+// Model
+//
+
+// Innstillinger
 const decksUsed = 2;
 
 let playingTable = document.getElementById('playing-table');
-let cardHeight = 200;
-let cardWidth = 150;
-let dealerPos = { x: 300, y: 20 };
-let playerPos = { x: 300, y: 500 };
+let cardSize = {};
+// let dealerPos = { x: 300, y: 20 };
+// let playerPos = { x: 300, y: 500 };
+let gameSize = {};
+let cardAreaHeight;
 
 let dealerHand = [];
 let playerHand = [];
@@ -13,22 +19,14 @@ let gameState = 'start';
 
 let deck = buildDeck(decksUsed);
 deck = shuffle(deck);
-dealerHand.push(draw(deck));
+//dealerHand.push(draw(deck));
 
 //dealCardsToPlayer();
 calcBaseDealerPos();
 
-function drawGame() {
-    drawButtons();
-}
-
-function drawButtons() {
-
-}
-
-function resetGame() {
-
-}
+//
+// View
+//
 
 function dealCardsToPlayer() {
 
@@ -40,38 +38,43 @@ function dealCardsToPlayer() {
 }
 
 function deal() {
-    playerHand += draw(deck);
+    playerHand.push(draw(deck));
+}
+
+function calcViewValues() {
+    gameSize.w = playingTable.clientWidth;
+    gameSize.h = playingTable.clientHeight;
+    cardAreaHeight = gameSize.h / 3;
+    cardSize.h = cardAreaHeight * 0.9;
+    cardSize.w = cardSize.h * 0.62;
 }
 
 function calcBaseDealerPos() {
-    let game_w = playingTable.clientWidth;
-    let game_h = playingTable.clientHeight;
-    cardAreaHeight = game_h / 3;
-    cardHeight = cardAreaHeight * 0.9;
-    cardWidth = cardHeight * 0.62;
-    let y = (cardAreaHeight - cardHeight) / 2;
-    let x = (game_w / 2) - (cardWidth / 2);
+    calcViewValues();
+    let y = (cardAreaHeight - cardSize.h) / 2;
+    let x = (gameSize.w / 2) - (cardSize.w / 2);
     playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight}" x2="2000" y2="${cardAreaHeight}" stroke="white" stroke-width="1">`;
     playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 2}" x2="2000" y2="${cardAreaHeight * 2}" stroke="white" stroke-width="1">`;
 
-    dealCard({ x, y }, { w: cardWidth, h: cardHeight }, "K");
+    dealCard({ x, y }, { w: cardSize.w, h: cardSize.h }, draw(deck));
+    dealCard({ x: x + 40, y }, { w: cardSize.w, h: cardSize.h }, draw(deck));
 }
 
-function dealCard(pos, size, value) {
-    playingTable.innerHTML += createCard(pos, size, value);
+function dealCard(pos, size, card) {
+    playingTable.innerHTML += createCard(pos, size, card);
 }
 
-function createCard(pos, size, value) {
+function createCard(pos, size, card) {
+    let color = 'black';
+    if (['♥', '♦'].includes(card.sort)) color = 'red';
     return `<g>
-                <rect class="card" stroke="black" stroke-fill="1" fill="white" x="${pos.x}" y="${pos.y}"
+                <rect class="card" stroke="black" stroke-fill="1" fill="white"
+                        x="${pos.x}" y="${pos.y}"
                         style="width:${size.w}; height:${size.h};"></rect>
-                <text x="${pos.x + 10}" y="${pos.y + 25}" fill="black">${value}</text>
+                <text x="${pos.x + 10}" y="${pos.y + 25}" fill="${color}">${card.sort}</text>
+                <text x="${pos.x + 10}" y="${pos.y + 50}" fill="${color}">${card.value}</text>
             </g>`;
 }
-
-function hit() { }
-
-function fold() { }
 
 function draw(deck) {
     return deck.pop();
@@ -107,78 +110,6 @@ function buildDeck(n) {
     return deck;
 }
 
-function buildDeckAlt(n) {
-    const cards = "🂡🂢🂣🂤🂥🂦🂧🂨🂩🂪🂫🂬🂭🂮🂱🂲🂳🂴🂵🂶🂷🂸🂹🂺🂻🂼🂽🂾🃁🃂🃃🃄🃅🃆🃇🃈🃉🃊🃋🃌🃍🃎🃑🃒🃓🃔🃕🃖🃗🃘🃙🃚🃛🃜🃝🃞";
-    for (let i of range(0, n)) {
-        for (card of cards) {
-            deck.push(card);
-        }
-    }
-}
-
-function getUnicode(card) {
-    if (card.sort === '♠') {
-        if (card.value === 'A') { return '🂡'; }
-        else if (card.value === '2') { return '🂢'; }
-        else if (card.value === '3') { return '🂣'; }
-        else if (card.value === '4') { return '🂤'; }
-        else if (card.value === '5') { return '🂥'; }
-        else if (card.value === '6') { return '🂦'; }
-        else if (card.value === '7') { return '🂧'; }
-        else if (card.value === '8') { return '🂨'; }
-        else if (card.value === '9') { return '🂩'; }
-        else if (card.value === '10') { return '🂪'; }
-        else if (card.value === 'J') { return '🂫'; }
-        else if (card.value === 'Q') { return '🂭'; }
-        else if (card.value === 'K') { return '🂮'; }
-    }
-    else if (card.sort === '♥') {
-        if (card.value === 'A') { return '🂱'; }
-        else if (card.value === '2') { return '🂲'; }
-        else if (card.value === '3') { return '🂳'; }
-        else if (card.value === '4') { return '🂴'; }
-        else if (card.value === '5') { return '🂵'; }
-        else if (card.value === '6') { return '🂶'; }
-        else if (card.value === '7') { return '🂷'; }
-        else if (card.value === '8') { return '🂸'; }
-        else if (card.value === '9') { return '🂹'; }
-        else if (card.value === '10') { return '🂺'; }
-        else if (card.value === 'J') { return '🂻'; }
-        else if (card.value === 'Q') { return '🂽'; }
-        else if (card.value === 'K') { return '🂾'; }
-    }
-    else if (card.sort === '♦') {
-        if (card.value === 'A') { return '🃁'; }
-        else if (card.value === '2') { return '🃂'; }
-        else if (card.value === '3') { return '🃃'; }
-        else if (card.value === '4') { return '🃄'; }
-        else if (card.value === '5') { return '🃅'; }
-        else if (card.value === '6') { return '🃆'; }
-        else if (card.value === '7') { return '🃇'; }
-        else if (card.value === '8') { return '🃈'; }
-        else if (card.value === '9') { return '🃉'; }
-        else if (card.value === '10') { return '🃊'; }
-        else if (card.value === 'J') { return '🃋'; }
-        else if (card.value === 'Q') { return '🃍'; }
-        else if (card.value === 'K') { return '🃎'; }
-    }
-    else if (card.sort === '♣') {
-        if (card.value === 'A') { return '🃑'; }
-        else if (card.value === '2') { return '🃒'; }
-        else if (card.value === '3') { return '🃓'; }
-        else if (card.value === '4') { return '🃔'; }
-        else if (card.value === '5') { return '🃕'; }
-        else if (card.value === '6') { return '🃖'; }
-        else if (card.value === '7') { return '🃗'; }
-        else if (card.value === '8') { return '🃘'; }
-        else if (card.value === '9') { return '🃙'; }
-        else if (card.value === '10') { return '🃚'; }
-        else if (card.value === 'J') { return '🃛'; }
-        else if (card.value === 'Q') { return '🃝'; }
-        else if (card.value === 'K') { return '🃞'; }
-    }
-}
-
 // Fisher-Yates shuffle
 function shuffle(array) {
     let t, i;
@@ -195,7 +126,7 @@ function shuffle(array) {
     return array;
 }
 
-// Range function from Python
+// Range funksjon fra Python
 function range(n, m) {
     array = [];
     for (let i = n; i < m; i++) {
