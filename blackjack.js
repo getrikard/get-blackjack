@@ -38,9 +38,9 @@ function drawGame() {
     playingTable.innerHTML = '';
 
     // Tegn hjelpelinjer
-    playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight}" x2="2000" y2="${cardAreaHeight}" stroke="white" stroke-width="1">`;
-    playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 2}" x2="2000" y2="${cardAreaHeight * 2}" stroke="white" stroke-width="1">`;
-    playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 3}" x2="2000" y2="${cardAreaHeight * 3}" stroke="white" stroke-width="1">`;
+    // playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight}" x2="2000" y2="${cardAreaHeight}" stroke="white" stroke-width="1">`;
+    // playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 2}" x2="2000" y2="${cardAreaHeight * 2}" stroke="white" stroke-width="1">`;
+    // playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 3}" x2="2000" y2="${cardAreaHeight * 3}" stroke="white" stroke-width="1">`;
 
     // Regne ut posisjonen til korta
     let totalWidth = cardSize.w + ((dealerHand.length - 1) * 40);
@@ -60,30 +60,44 @@ function drawGame() {
 
     // Tegn kort til spiller
     for (card of playerHand) {
-        let onclk = `playerHand.push(deck.pop()); drawGame(); console.log('Playerhand: ' + sumHand(playerHand));`;
+        let onclk = ``;
         playingTable.innerHTML += createCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, onclk);
         x += 35;
     }
 
-    // Regne ut posisjonen til knappene
+    drawButtons();
+}
+
+function drawButtons() {
+    // Regne ut hvilke knapper som skal tegnes
+    let buttons = [
+        { name: 'fold', symbol: '🔚' },
+        { name: 'stand', symbol: '✋' },
+        { name: 'hit', symbol: '➕' }
+    ];
+
     let btn = {};
     btn.w = cardAreaHeight / 1.4;
     btn.h = btn.w;
-    btn.x = (gameSize.w / 2) - (btn.w / 2);
-    btn.y = (gameSize.h / 2) - (btn.h / 2);
+    let spaceWidth = 30;
+    let totalWidth = btn.w * buttons.length + spaceWidth * (buttons.length - 1);
+
+    // Regne ut posisjonen til knappene
+    // btn.x = (gameSize.w / 2) - (btn.w / 2);
+    btn.x = (gameSize.w / 2) - (totalWidth / 2);
+    // btn.y = (gameSize.h / 2) - (btn.h / 2);
     btn.y = (cardAreaHeight * 3.5) - (btn.h / 2)
 
-    // Tegn knapper
-    playingTable.innerHTML += `<g>
-                                <rect stroke="white" stroke-width="2" fill="green"
-                                        x="${btn.x}" y="${btn.y}" rx="50%"
-                                        style="width:${btn.w}; height:${btn.h};"></rect>
-                                <text x="${btn.x + (btn.w / 8)}" y="${btn.y + (btn.h / 1.3)}" fill="black" style="font-size:${btn.h / 1.3}px;">✋</text>
-                            </g>`;
-}
-
-function drawCard() {
-
+    for (button of buttons) {
+        // Tegn knapper
+        playingTable.innerHTML += `<g class="button" onclick="${button.name}()">
+                            <rect stroke="white" stroke-width="0" fill="green"
+                                    x="${btn.x}" y="${btn.y}" rx="50%"
+                                    style="width:${btn.w}; height:${btn.h};"></rect>
+                            <text x="${btn.x + (btn.w / 2)}" y="${btn.y + (btn.h * 0.77)}" fill="black" style="text-anchor:middle; font-size:${btn.h / 1.3}px;">${button.symbol}</text>
+                        </g>`;
+        btn.x += btn.w + spaceWidth;
+    }
 }
 
 function calcViewValues() {
@@ -107,7 +121,7 @@ function createCard(pos, size, card, onclickFunction) {
     }
 
     return `<g class="card" onclick="${onclickFunction}">
-                <rect stroke="black" stroke-width="1.5" fill="${bgColor}"
+                <rect stroke="black" stroke-width="2" fill="${bgColor}"
                         x="${pos.x}" y="${pos.y}" rx="10"
                         style="width:${size.w}; height:${size.h};"></rect>
                 <text x="${pos.x + 10}" y="${pos.y + 25}" fill="${textColor}">${sort}</text>
@@ -117,6 +131,12 @@ function createCard(pos, size, card, onclickFunction) {
 
 function deal() {
     dealerHand.push(deck.pop());
+    drawGame();
+}
+
+function hit() {
+    playerHand.push(deck.pop());
+    console.log('Playerhand: ' + sumHand(playerHand));
     drawGame();
 }
 
