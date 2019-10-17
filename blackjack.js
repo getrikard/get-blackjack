@@ -16,8 +16,10 @@ let playerHand = [];
 let gameState = 'start';
 
 let deck = buildDeck(decksUsed);
-deck = shuffle(deck);
-dealerHand.push(draw(deck));
+dealerHand.push(deck.pop());
+dealerHand.push(deck.pop());
+dealerHand[1].hidden = true;
+console.log(sumHand(dealerHand));
 drawGame();
 
 //
@@ -33,14 +35,32 @@ function drawGame() {
     playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight}" x2="2000" y2="${cardAreaHeight}" stroke="white" stroke-width="1">`;
     playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 2}" x2="2000" y2="${cardAreaHeight * 2}" stroke="white" stroke-width="1">`;
 
+    // Regne ut posisjonen til korta
     let totalWidth = cardSize.w + ((dealerHand.length - 1) * 40);
     let y = (cardAreaHeight - cardSize.h) / 2;
     let x = (gameSize.w / 2) - (totalWidth / 2);
 
+    // Tegn kort
     for (card of dealerHand) {
-        dealCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, 'deal');
+        let onclk = 'deal();console.log(sumHand(dealerHand));';
+        playingTable.innerHTML += createCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, onclk);
         x += 40;
     }
+
+    // Regne ut posisjonen til knappene
+    let btn = {};
+    btn.w = cardAreaHeight / 2.5;
+    btn.h = btn.w;
+    btn.x = (gameSize.w / 2) - (btn.w / 2);
+    btn.y = (gameSize.h / 2) - (btn.h / 2);
+
+    // Tegn knapper
+    playingTable.innerHTML += `<g>
+                                <rect stroke="white" stroke-width="2" fill="green"
+                                        x="${btn.x}" y="${btn.y}" rx="50%"
+                                        style="width:${btn.w}; height:${btn.h};"></rect>
+                                <text x="${btn.x + (btn.w / 8)}" y="${btn.y + (btn.h / 1.3)}" fill="black" style="font-size:${btn.h / 1.3}px;">✋</text>
+                            </g>`;
 }
 
 function calcViewValues() {
@@ -51,81 +71,33 @@ function calcViewValues() {
     cardSize.w = cardSize.h * 0.62;
 }
 
-function dealCard(pos, size, card, onclickFunction) {
-    playingTable.innerHTML += createCard(pos, size, card, onclickFunction);
-}
-
 function createCard(pos, size, card, onclickFunction) {
-    let color = 'black';
-    if (['♥', '♦'].includes(card.sort)) {
-        color = 'red';
+    let textColor = 'black';
+    let bgColor = 'white';
+    let sort = card.sort;
+    let value = card.value;
+    if (['♥', '♦'].includes(card.sort)) { textColor = 'red'; }
+    if (card.hidden === true) {
+        bgColor = 'blue';
+        sort = '';
+        value = '';
     }
-    return `<g>
-                <rect class="card" stroke="black" stroke-fill="1" fill="white"
-                        x="${pos.x}" y="${pos.y}"
-                        onclick="${onclickFunction}()"
+
+    return `<g class="card" onclick="${onclickFunction}">
+                <rect stroke="black" stroke-width="1.5" fill="${bgColor}"
+                        x="${pos.x}" y="${pos.y}" rx="10"
                         style="width:${size.w}; height:${size.h};"></rect>
-                <text x="${pos.x + 10}" y="${pos.y + 25}" fill="${color}">${card.sort}</text>
-                <text x="${pos.x + 10}" y="${pos.y + 50}" fill="${color}">${card.value}</text>
+                <text x="${pos.x + 10}" y="${pos.y + 25}" fill="${textColor}">${sort}</text>
+                <text x="${pos.x + 10}" y="${pos.y + 50}" fill="${textColor}">${value}</text>
             </g>`;
 }
 
 function deal() {
-    dealerHand.push(draw(deck));
+    dealerHand.push(deck.pop());
     drawGame();
 }
 
-function draw(deck) {
-    return deck.pop();
-}
-
-function sumHand(hand) {
-    let sum = 0;
-    let aces = 0;
-    for (card of hand) {
-        if (['J', 'Q', 'K'].includes(card.value)) { sum += 10; }
-        else if (card.value === 'A') { aces++; }
-        else { sum += parseInt(card.value); }
-    }
-    for (ace of range(0, aces)) {
-        if (sum + 11 > 21) sum++;
-        else sum += 11;
-    }
-    return sum;
-}
-
-function buildDeck(n) {
-    let deck = [];
-    for (let i of range(0, n)) {
-        for (sort of ['♠', '♥', '♦', '♣']) {
-            for (let value of range(2, 11)) {
-                deck.push({ sort, value: value.toString() });
-            }
-            for (let value of ['J', 'Q', 'K', 'A']) {
-                deck.push({ sort, value });
-            }
-        }
-    }
-    return deck;
-}
-
-// Fisher-Yates shuffle
-function shuffle(array) {
-    let t, i;
-    let m = array.length;
-    // While there remain elements to shuffle...
-    while (m) {
-        // Pick a remaining element...
-        i = Math.floor(Math.random() * m--);
-        // And swap it with the current element.
-        t = array[m];
-        array[m] = array[i];
-        array[i] = t;
-    }
-    return array;
-}
-
-// Range funksjon fra Python
+// Range-funksjon fra Python
 function range(n, m) {
     array = [];
     for (let i = n; i < m; i++) {
