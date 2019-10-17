@@ -49,7 +49,7 @@ function drawGame() {
 
     // Tegn kort til dealer
     for (card of dealerHand) {
-        let onclk = 'dealerHand.push(deck.pop()); drawGame(); console.log(sumHand(dealerHand));';
+        let onclk = 'dealerHand.push(deck.pop()); drawGame(); console.log(sumHand('Dealerhand: ' + dealerHand));';
         playingTable.innerHTML += createCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, onclk);
         x += 35;
     }
@@ -60,7 +60,7 @@ function drawGame() {
 
     // Tegn kort til spiller
     for (card of playerHand) {
-        let onclk = 'playerHand.push(deck.pop()); drawGame(); console.log(sumHand(playerHand));';
+        let onclk = 'playerHand.push(deck.pop()); drawGame(); console.log(sumHand('Playerhand: ' + playerHand));';
         playingTable.innerHTML += createCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, onclk);
         x += 35;
     }
