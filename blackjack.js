@@ -44,7 +44,7 @@ function drawGame() {
     // playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 3}" x2="2000" y2="${cardAreaHeight * 3}" stroke="white" stroke-width="1">`;
 
     // Regne ut posisjonen til korta til dealer
-    let totalWidth = cardSize.w + ((dealerHand.length - 1) * 40);
+    let totalWidth = cardSize.w + ((dealerHand.length - 1) * 35);
     let y = (cardAreaHeight - cardSize.h) / 2;
     let x = (gameSize.w / 2) - (totalWidth / 2);
 
@@ -58,7 +58,7 @@ function drawGame() {
     }
 
     // Regne ut posisjonen til korta til spiller
-    totalWidth = cardSize.w + ((playerHand.length - 1) * 40);
+    totalWidth = cardSize.w + ((playerHand.length - 1) * 35);
     y = (cardAreaHeight * 5 - cardSize.h) / 2;
     x = (gameSize.w / 2) - (totalWidth / 2);
 
