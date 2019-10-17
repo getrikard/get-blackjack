@@ -16,10 +16,16 @@ let playerHand = [];
 let gameState = 'start';
 
 let deck = buildDeck(decksUsed);
+
 dealerHand.push(deck.pop());
 dealerHand.push(deck.pop());
 dealerHand[1].hidden = true;
-console.log(sumHand(dealerHand));
+console.log('Dealerhand: ' + sumHand(dealerHand));
+
+playerHand.push(deck.pop());
+playerHand.push(deck.pop());
+console.log('Playerhand: ' + sumHand(playerHand));
+
 drawGame();
 
 //
@@ -34,25 +40,38 @@ function drawGame() {
     // Tegn hjelpelinjer
     playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight}" x2="2000" y2="${cardAreaHeight}" stroke="white" stroke-width="1">`;
     playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 2}" x2="2000" y2="${cardAreaHeight * 2}" stroke="white" stroke-width="1">`;
+    playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 3}" x2="2000" y2="${cardAreaHeight * 3}" stroke="white" stroke-width="1">`;
 
     // Regne ut posisjonen til korta
     let totalWidth = cardSize.w + ((dealerHand.length - 1) * 40);
     let y = (cardAreaHeight - cardSize.h) / 2;
     let x = (gameSize.w / 2) - (totalWidth / 2);
 
-    // Tegn kort
+    // Tegn kort til dealer
     for (card of dealerHand) {
-        let onclk = 'deal();console.log(sumHand(dealerHand));';
+        let onclk = 'dealerHand.push(deck.pop()); drawGame(); console.log(sumHand(dealerHand));';
         playingTable.innerHTML += createCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, onclk);
-        x += 40;
+        x += 35;
+    }
+
+    totalWidth = cardSize.w + ((playerHand.length - 1) * 40);
+    y = (cardAreaHeight * 5 - cardSize.h) / 2;
+    x = (gameSize.w / 2) - (totalWidth / 2);
+
+    // Tegn kort til spiller
+    for (card of playerHand) {
+        let onclk = 'playerHand.push(deck.pop()); drawGame(); console.log(sumHand(playerHand));';
+        playingTable.innerHTML += createCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, onclk);
+        x += 35;
     }
 
     // Regne ut posisjonen til knappene
     let btn = {};
-    btn.w = cardAreaHeight / 2.5;
+    btn.w = cardAreaHeight / 1.4;
     btn.h = btn.w;
     btn.x = (gameSize.w / 2) - (btn.w / 2);
     btn.y = (gameSize.h / 2) - (btn.h / 2);
+    btn.y = (cardAreaHeight * 3.5) - (btn.h / 2)
 
     // Tegn knapper
     playingTable.innerHTML += `<g>
@@ -63,10 +82,14 @@ function drawGame() {
                             </g>`;
 }
 
+function drawCard() {
+
+}
+
 function calcViewValues() {
     gameSize.w = playingTable.clientWidth;
     gameSize.h = playingTable.clientHeight;
-    cardAreaHeight = gameSize.h / 3;
+    cardAreaHeight = gameSize.h / 4;
     cardSize.h = cardAreaHeight * 0.9;
     cardSize.w = cardSize.h * 0.62;
 }
@@ -77,7 +100,7 @@ function createCard(pos, size, card, onclickFunction) {
     let sort = card.sort;
     let value = card.value;
     if (['♥', '♦'].includes(card.sort)) { textColor = 'red'; }
-    if (card.hidden === true) {
+    if (card.hidden) {
         bgColor = 'blue';
         sort = '';
         value = '';
