@@ -5,6 +5,7 @@
 // Innstillinger
 const decksUsed = 2;
 
+// Globale ting
 let playingTable = document.getElementById('playing-table');
 let cardSize = {};
 let gameSize = {};
@@ -13,13 +14,13 @@ let cardAreaHeight;
 let dealerHand = [];
 let playerHand = [];
 
-let gameState = 'start';
+let gameOver = false;
 
 let deck = buildDeck(decksUsed);
 
 dealerHand.push(deck.pop());
 dealerHand.push(deck.pop());
-dealerHand[1].hidden = true;
+dealerHand[0].hidden = true;
 console.log('Dealerhand: ' + sumHand(dealerHand));
 
 playerHand.push(deck.pop());
@@ -42,26 +43,28 @@ function drawGame() {
     // playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 2}" x2="2000" y2="${cardAreaHeight * 2}" stroke="white" stroke-width="1">`;
     // playingTable.innerHTML += `<line x1="0" y1="${cardAreaHeight * 3}" x2="2000" y2="${cardAreaHeight * 3}" stroke="white" stroke-width="1">`;
 
-    // Regne ut posisjonen til korta
+    // Regne ut posisjonen til korta til dealer
     let totalWidth = cardSize.w + ((dealerHand.length - 1) * 40);
     let y = (cardAreaHeight - cardSize.h) / 2;
     let x = (gameSize.w / 2) - (totalWidth / 2);
 
+    // Tegn trekkebunke
+    playingTable.innerHTML += createCard({ x: y, y }, { w: cardSize.w, h: cardSize.h }, { hidden: true }, '');
+
     // Tegn kort til dealer
     for (card of dealerHand) {
-        let onclk = `dealerHand.push(deck.pop()); drawGame(); console.log('Dealerhand: ' + sumHand(dealerHand));`;
-        playingTable.innerHTML += createCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, onclk);
+        playingTable.innerHTML += createCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, '');
         x += 35;
     }
 
+    // Regne ut posisjonen til korta til spiller
     totalWidth = cardSize.w + ((playerHand.length - 1) * 40);
     y = (cardAreaHeight * 5 - cardSize.h) / 2;
     x = (gameSize.w / 2) - (totalWidth / 2);
 
     // Tegn kort til spiller
     for (card of playerHand) {
-        let onclk = ``;
-        playingTable.innerHTML += createCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, onclk);
+        playingTable.innerHTML += createCard({ x, y }, { w: cardSize.w, h: cardSize.h }, card, '');
         x += 35;
     }
 
@@ -76,16 +79,18 @@ function drawButtons() {
         { name: 'hit', symbol: '➕' }
     ];
 
+    if (gameOver) {
+        buttons = [{ name: 'restart', symbol: '↩️' }];
+    }
+
+    // Regne ut posisjonen til knappene
+    let spaceWidth = 30;
     let btn = {};
     btn.w = cardAreaHeight / 1.4;
     btn.h = btn.w;
-    let spaceWidth = 30;
     let totalWidth = btn.w * buttons.length + spaceWidth * (buttons.length - 1);
 
-    // Regne ut posisjonen til knappene
-    // btn.x = (gameSize.w / 2) - (btn.w / 2);
     btn.x = (gameSize.w / 2) - (totalWidth / 2);
-    // btn.y = (gameSize.h / 2) - (btn.h / 2);
     btn.y = (cardAreaHeight * 3.5) - (btn.h / 2)
 
     for (button of buttons) {
@@ -129,22 +134,55 @@ function createCard(pos, size, card, onclickFunction) {
             </g>`;
 }
 
-function deal() {
-    dealerHand.push(deck.pop());
-    drawGame();
-}
+//
+// Controller
+//
 
 function hit() {
     playerHand.push(deck.pop());
+    if (sumHand(playerHand) > 21) {
+        console.log('Over 21.');
+        gameOver = true;
+        console.log(`${getWinner()} vant!`);
+    }
     console.log('Playerhand: ' + sumHand(playerHand));
     drawGame();
 }
 
-// Range-funksjon fra Python
-function range(n, m) {
-    array = [];
-    for (let i = n; i < m; i++) {
-        array.push(i);
+function stand() {
+    dealerHand[0].hidden = false;
+    while (sumHand(dealerHand) <= 17) {
+        dealerHand.push(deck.pop());
     }
-    return array;
+    console.log('Dealerhand: ' + sumHand(dealerHand));
+    gameOver = true;
+    console.log(`${getWinner()} vant!`);
+    drawGame();
+}
+
+function restart() {
+    deck = buildDeck(decksUsed);
+    dealerHand = [deck.pop(), deck.pop()];
+    dealerHand[0].hidden = true;
+    playerHand = [deck.pop(), deck.pop()];
+    gameOver = false;
+    drawGame();
+}
+
+function getWinner() {
+    let playerScore = 21 - sumHand(playerHand);
+    let dealerScore = 21 - sumHand(dealerHand);
+    if (playerScore > dealerScore) {
+        return 'Dealer';
+    }
+    else if (playerScore === dealerScore) {
+        return 'Ingen';
+    }
+    return 'Spiller';
+}
+
+function fold() {
+    dealerHand[0].hidden = false;
+    gameOver = true;
+    drawGame();
 }

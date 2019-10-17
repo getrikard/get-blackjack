@@ -74,3 +74,12 @@ function sumHand(hand) {
     }
     return sum;
 }
+
+// Range-funksjon fra Python
+function range(n, m) {
+    array = [];
+    for (let i = n; i < m; i++) {
+        array.push(i);
+    }
+    return array;
+}
