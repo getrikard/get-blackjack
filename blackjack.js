@@ -200,6 +200,7 @@ function restart() {
     dealerHand[0].hidden = true;
     playerHand = [deck.pop(), deck.pop()];
     gameOver = false;
+    console.log('== Ny runde ==');
     console.log('Dealer: ' + sumHand(dealerHand));
     console.log('Player: ' + sumHand(playerHand));
     bigMessage = '';
