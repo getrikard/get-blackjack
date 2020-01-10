@@ -180,16 +180,21 @@ function stand() {
     bigMessage = '';
     dealerHand[0].hidden = false;
     while (sumHand(dealerHand) <= 17) {
-        dealerHand.push(deck.pop());
+        if (sumHand(dealerHand) <= sumHand(playerHand)) {
+            dealerHand.push(deck.pop());
+        }
+        else {
+            break;
+        }
     }
     console.log('Dealer: ' + sumHand(dealerHand));
-    if (sumHand(dealerHand) > 21) {
-        bigMessage = 'Spiller vant!';
-        console.log(bigMessage);
-    } else {
-        bigMessage = `${getWinner()} vant.`;
-        console.log(bigMessage);
-    }
+    // if (sumHand(dealerHand) > 21) {
+    //     bigMessage = 'Spiller vant!';
+    //     console.log(bigMessage);
+    // } else {
+    bigMessage = `${getWinner()} vant.`;
+    console.log(bigMessage);
+    // }
     gameOver = true;
     drawGame();
 }
@@ -210,7 +215,13 @@ function restart() {
 function getWinner() {
     let playerScore = 21 - sumHand(playerHand);
     let dealerScore = 21 - sumHand(dealerHand);
-    if (playerScore >= dealerScore) {
+    if (sumHand(playerHand) > 21) {
+        return 'Dealer';
+    }
+    else if (sumHand(dealerHand) > 21) {
+        return 'Spiller';
+    }
+    else if (playerScore >= dealerScore) {
         return 'Dealer';
     }
     return 'Spiller';
